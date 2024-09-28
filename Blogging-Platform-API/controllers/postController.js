@@ -1,4 +1,5 @@
 const Post = require('../models/postModel');
+const AppError = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync');
 
 const getAllPosts = catchAsync(async (req, res) => {
@@ -14,6 +15,60 @@ const getAllPosts = catchAsync(async (req, res) => {
   });
 });
 
+const createPost = catchAsync(async (req, res, next) => {
+  const newPost = req.body;
+  const post = await Post.create(newPost);
+  res.status(201).json({
+    status: 'success',
+    data: {
+      post,
+    },
+  });
+});
+
+const getPost = catchAsync(async (req, res, next) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) return new AppError('Post not found', 400); // 400 => BAD REQUEST
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      post,
+    },
+  });
+});
+
+const updatePost = catchAsync(async (req, res, next) => {
+  req.body.updatedAt = Date.now();
+
+  const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!post) return new AppError('Post not found', 400);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      post,
+    },
+  });
+});
+
+const deletePost = catchAsync(async (req, res, next) => {
+  const post = await Post.findByIdAndDelete(req.params.id);
+  if (!post) return new AppError('Post not found', 400);
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
+
 module.exports = {
   getAllPosts,
+  createPost,
+  getPost,
+  updatePost,
+  deletePost,
 };
