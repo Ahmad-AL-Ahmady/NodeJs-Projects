@@ -6,7 +6,7 @@ class ApiFeatures {
 
   filter() {
     const queryObj = { ...this.queryString };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    const excludedFields = ['page', 'sort', 'fields', 'term'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
     const queryStr = JSON.stringify(queryObj).replace(
@@ -34,6 +34,21 @@ class ApiFeatures {
       this.query = this.query.select(selectBy);
     } else {
       this.query = this.query.select('-__v');
+    }
+
+    return this;
+  }
+
+  search() {
+    if (this.queryString.term) {
+      const searchTerm = this.queryString.term;
+      this.query = this.query.find({
+        $or: [
+          { title: { $regex: searchTerm, $options: 'i' } },
+          { content: { $regex: searchTerm, $options: 'i' } },
+          { category: { $regex: searchTerm, $options: 'i' } },
+        ],
+      });
     }
 
     return this;

@@ -8,7 +8,8 @@ const getAllPosts = catchAsync(async (req, res) => {
   const features = new ApiFeatures(Post.find(), req.query)
     .filter()
     .sort()
-    .limitFields();
+    .limitFields()
+    .search();
 
   const posts = await features.query;
   // Return them in JSON format
