@@ -20,6 +20,12 @@ const postSchema = new mongoose.Schema({
   tags: {
     type: [String],
     required: [true, 'Posts must have at least one tag'],
+    validate: {
+      validator: function (val) {
+        return val.length > 0;
+      },
+      message: 'Tags must have at 1 tag',
+    },
   },
   createdAt: {
     type: Date,
